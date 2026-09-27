@@ -40,7 +40,28 @@
 
 ## Task 2 — Tailgating
 
-### The planted anomalies (two bursts)
+Start here, because it is the case a straightforward detector catches.
+
+### The easy planted anomaly (Burst 0 — start here)
+
+**B-0011 / B-0019 / B-0026, Friday 2026-10-02, 11:47, ONE door in 28 seconds:**
+
+| badge_id | door | timestamp | seconds from previous |
+|---|---|---|---|
+| B-0011 | LIB-ENTRY | 2026-10-02 11:47:20 | - |
+| B-0019 | LIB-ENTRY | 2026-10-02 11:47:34 | 14 |
+| B-0026 | LIB-ENTRY | 2026-10-02 11:47:48 | 14 |
+
+Three *different* badges, one reader, no badging out, 28 seconds total. Three
+people, one door, too fast, and the third never badged. **This is tailgating as
+your lesson defines it, and a same-door burst detector catches it on the first
+try.** If your task-2 output is empty, you have a bug, not an empty dataset.
+
+### The hard planted anomalies (two travel-speed bursts)
+
+Both of these span four *different* doors, so a same-door burst detector returns
+nothing for either. They are caught by the task-1 travel-speed logic. Work them
+only after Burst 0 is working.
 
 **Burst A — B-0203, Thursday 2026-10-08, 09:12, four doors in 27 seconds:**
 
@@ -69,6 +90,29 @@
 - LIB-ENTRY → SCI-ANNEX → LIB-ENTRY → MAIN-EAST in 27 seconds, at lunchtime on a Tuesday. **This is not a person.** There is no walk that does that. It is a badge being carried to make a record, or a reader stuck in a retry loop, or a genuine credential test.
 
 **What a same-door burst detector *will* find** are pairs of genuine `granted` events seconds apart at the same reader — the tailgating pattern as the lesson defines it. Those are mostly two-person rushes at a staff door during the morning arrival wave, and they are **noise at volume**. A burst of 2 at a library door at 12:40 is a lunch queue.
+
+### The benign twin: the staff meeting
+
+| badge_id | door | timestamp |
+|---|---|---|
+| B-0031 | MAIN-EAST | 2026-10-09 16:30:00 |
+| B-0038 | MAIN-EAST | 2026-10-09 16:30:11 |
+| B-0043 | MAIN-EAST | 2026-10-09 16:30:22 |
+
+- **Three different badges at one door in 22 seconds, 16:30 on a Friday.** To a
+  same-door burst detector this looks *exactly* like Burst 0 — different badges,
+  one door, under a minute, no badging out. It is not tailgating. It is three
+  teachers leaving a staff meeting together, which is what people do at 16:30.
+- **Why it is not a finding:** nothing in the log distinguishes it from Burst 0.
+  Same shape, same columns, same threshold. The only things separating them live
+  outside the data — the staff meeting calendar, the 16:30 slot, the fact that it
+  is the last event of the day for all three badges. **This is the strongest
+  argument in the lab for why a badge log alone is not a detection system.** A
+  rule that catches Burst 0 will catch this forever, and someone will turn that
+  rule off within a month.
+- **A third same-door burst exists and is also noise:** B-1009 / B-1023 / B-1019
+  at MAIN-WEST, 2026-10-13 07:47–07:48, 45 seconds. Morning arrival wave. Do not
+  report it.
 
 ### The benign twin: the guard patrol sweep
 
