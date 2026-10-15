@@ -40,12 +40,14 @@ timestamp, badge_id, door, result
 
 ## The four detections
 
-| Task | Detection | Output file | Rows it returns |
-|---|---|---|---|
-| 1 | **Shared badges** — one credential at two doors far enough apart that the gap between them is too short to walk | `results_task1.csv` | 29 |
-| 2 | **Tailgating** — bursts of `granted` events within 15 seconds of each other at the same reader | `results_task2.csv` | 8 |
-| 3 | **Failed then success** — a `denied` event followed by a `granted` event on the same badge, with the count of denials that came first | `results_task3.csv` | 29 |
-| 4 | **After-hours access** — anything outside 07:00–18:00 on a weekday, and anything at all on a weekend | `results_task4.csv` | 13 |
+| Task | Detection | Output file |
+|---|---|---|
+| 1 | **Shared badges** — one credential at two doors far enough apart that the gap between them is too short to walk | `results_task1.csv` |
+| 2 | **Tailgating** — bursts of `granted` events within 15 seconds of each other at the same reader | `results_task2.csv` |
+| 3 | **Failed then success** — a `denied` event followed by a `granted` event on the same badge, with the count of denials that came first | `results_task3.csv` |
+| 4 | **After-hours access** — anything outside 07:00–18:00 on a weekday, and anything at all on a weekend | `results_task4.csv` |
+
+**Your output is the only place those row counts exist.** Run the script, then read your own four files — the counts are part of what you report.
 
 The thresholds are visible in the script and they are **judgement calls, not facts**: `TRAVEL_SECONDS = 240` for task 1, `gap_seconds=15` for task 2. If you think a threshold is wrong, say so with evidence — that argument is worth more than the output.
 
@@ -57,7 +59,7 @@ The thresholds are visible in the script and they are **judgement calls, not fac
 
 **Every one of these detections has a benign twin in the data.** A guard on a patrol sweep. A janitor. A teacher who badged into the annex on the way to the gym, then out the far door because it is closer to the car park. Three people leaving a staff meeting together.
 
-Your job is not to report every hit. Your job is to decide which hits you are reporting, and to say why the rest is noise. In task 3 the rule returns 29 rows and **one** of them is worth acting on — the difference is a single column (`prior_denials`). In task 4 the rule returns 13 rows and two are candidates. Finding the difference between those rows is the assignment; the rules are just what gets you the list.
+Your job is not to report every hit. Your job is to decide which hits you are reporting, and to say why the rest is noise. In task 3 the rule returns a long list of hits, and **one column** — `prior_denials` — separates the rows worth acting on from the rest. In task 4 the list is short but the judgement is the whole task. Finding the difference between those rows is the assignment; the rules are just what gets you the list.
 
 **How do you avoid alert fatigue?** Baseline first — what does normal look like for *this* door, *this* badge, *this* hour? Then thresholds that key on **deviation** rather than on absolute events — the guard's punctuality is what makes him benign; a credential that is *not* punctual is not. Then a hard volume budget: if a rule fires more than a handful of times a week, it is a **report**, not an **alert**, and a report can wait until morning.
 
